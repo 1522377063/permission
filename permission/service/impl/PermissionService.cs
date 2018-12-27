@@ -38,7 +38,7 @@ namespace permission.service.impl
                     strSql = @"SELECT u.hy_username as username,p.p_name as pname,up.p_value as pvalue FROM user_permission up RIGHT JOIN (SELECT * FROM `user` WHERE `user`.hy_userid=@hy_userid) u ON up.uid=u.hy_userid RIGHT JOIN permission p ON up.pid=p.p_id";
                     mySqlParameters = new MySqlParameter[]
                     {
-                        new MySqlParameter("@hy_userid",MySqlDbType.Int32) {Value = user.hy_userid},
+                        new MySqlParameter("@hy_userid",MySqlDbType.VarChar,50) {Value = user.hy_userid},
                     };
                     //获取每一个用户对应的权限
                     List<PartPermission> partPermissionList = ResultUtil.getResultList<PartPermission>(strSql, mySqlParameters);
@@ -66,18 +66,18 @@ namespace permission.service.impl
         {
             JObject jo = JsonConvert.DeserializeObject(json) as JObject;
             string username = jo["username"].ToString();
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-            dic.Add("cunzhuang", jo["cunzhuang"].ToString());
-            dic.Add("cesuo", jo["cesuo"].ToString());
-            dic.Add("minsu", jo["minsu"].ToString());
-            dic.Add("jingqu", jo["jingqu"].ToString());
-            dic.Add("addtuceng", jo["addtuceng"].ToString());
-            dic.Add("shouhuiditu", jo["shouhuiditu"].ToString());
-            dic.Add("addimage", jo["addimage"].ToString());
-            dic.Add("ninghaimaoyucun", jo["ninghaimaoyucun"].ToString());
-            dic.Add("ninghai", jo["ninghai"].ToString());
-            dic.Add("addmodel", jo["addmodel"].ToString());
-            dic.Add("addpanorama", jo["addpanorama"].ToString());
+            Dictionary<string, int> dic = new Dictionary<string, int>();
+            dic.Add("cunzhuang", (int)jo["cunzhuang"]);
+            dic.Add("cesuo", (int)jo["cesuo"]);
+            dic.Add("minsu", (int)jo["minsu"]);
+            dic.Add("jingqu", (int)jo["jingqu"]);
+            dic.Add("addtuceng", (int)jo["addtuceng"]);
+            dic.Add("shouhuiditu", (int)jo["shouhuiditu"]);
+            dic.Add("addimage", (int)jo["addimage"]);
+            dic.Add("ninghaimaoyucun", (int)jo["ninghaimaoyucun"]);
+            dic.Add("ninghai", (int)jo["ninghai"]);
+            dic.Add("addmodel", (int)jo["addmodel"]);
+            dic.Add("addpanorama", (int)jo["addpanorama"]);
             strSql = @"SELECT u.hy_username as username,p.p_name as pname,up.p_value as pvalue FROM user_permission up RIGHT JOIN (SELECT * FROM `user` WHERE `user`.hy_username=@hy_username) u ON up.uid=u.hy_userid RIGHT JOIN permission p ON up.pid=p.p_id";
             mySqlParameters = new MySqlParameter[]
             {
@@ -107,17 +107,17 @@ namespace permission.service.impl
                     {
                         new MySqlParameter("@hy_username",MySqlDbType.VarChar,50) {Value=username },
                         new MySqlParameter("@p_name",MySqlDbType.VarChar,50) {Value=pp.pname },
-                        new MySqlParameter("@p_value",MySqlDbType.VarChar,10) {Value=pp.pvalue }
+                        new MySqlParameter("@p_value",MySqlDbType.Int32) {Value=pp.pvalue }
                     };
                     ResultUtil.insOrUpdOrDel(strSql, mySqlParameters);
                 }
             }
-            foreach (KeyValuePair<string, string> kv in dic)
+            foreach (KeyValuePair<string, int> kv in dic)
             {
                 strSql = "UPDATE user_permission up SET up.p_value=@p_value WHERE up.uid=(SELECT `user`.hy_userid FROM `user` WHERE `user`.hy_username=@hy_username) AND up.pid=(SELECT permission.p_id FROM permission WHERE permission.p_name=@p_name)";
                 mySqlParameters = new MySqlParameter[]
                 {
-                    new MySqlParameter("@p_value",MySqlDbType.VarChar,10) {Value=kv.Value },
+                    new MySqlParameter("@p_value",MySqlDbType.Int32) {Value=kv.Value },
                     new MySqlParameter("@hy_username",MySqlDbType.VarChar,50) {Value=username },
                     new MySqlParameter("@p_name",MySqlDbType.VarChar,50) {Value=kv.Key }
                 };
