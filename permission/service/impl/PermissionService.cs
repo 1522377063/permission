@@ -18,8 +18,8 @@ namespace permission.service.impl
         public string GetUserPermissionList(int page, int rows)
         {
             int total = int.Parse(ResultUtil.getResultString("SELECT count(1) FROM `user`"));
-            //获取每一个用户
-            strSql = "SELECT * FROM `user` LIMIT @begin,@rows";
+            //获取每一个用户,除username为null的用户
+            strSql = "SELECT * FROM `user` WHERE hy_username!='' LIMIT @begin,@rows";
             mySqlParameters = new MySqlParameter[]
             {
                 new MySqlParameter("@begin",MySqlDbType.Int32) {Value=((page-1)*Convert.ToInt32(rows)) },
@@ -66,62 +66,18 @@ namespace permission.service.impl
         {
             JObject jo = JsonConvert.DeserializeObject(json) as JObject;
             string username = jo["username"].ToString();
-            Dictionary<string, int> dic = new Dictionary<string, int>();
-            if (jo["cunzhuang"] == null)
-            {
-                jo["cunzhuang"] = 0;
-            }
-            dic.Add("cunzhuang", (int)jo["cunzhuang"]);
-            if (jo["cesuo"] == null)
-            {
-                jo["cesuo"] = 0;
-            }
-            dic.Add("cesuo", (int)jo["cesuo"]);
-            if (jo["minsu"] == null)
-            {
-                jo["minsu"] = 0;
-            }
-            dic.Add("minsu", (int)jo["minsu"]);
-            if (jo["jingqu"] == null)
-            {
-                jo["jingqu"] = 0;
-            }
-            dic.Add("jingqu", (int)jo["jingqu"]);
-            if (jo["addtuceng"] == null)
-            {
-                jo["addtuceng"] = 0;
-            }
-            dic.Add("addtuceng", (int)jo["addtuceng"]);
-            if (jo["shouhuiditu"] == null)
-            {
-                jo["shouhuiditu"] = 0;
-            }
-            dic.Add("shouhuiditu", (int)jo["shouhuiditu"]);
-            if (jo["addimage"] == null)
-            {
-                jo["addimage"] = 0;
-            }
-            dic.Add("addimage", (int)jo["addimage"]);
-            if (jo["ninghaimaoyucun"] == null)
-            {
-                jo["ninghaimaoyucun"] = 0;
-            }
-            dic.Add("ninghaimaoyucun", (int)jo["ninghaimaoyucun"]);
-            if (jo["ninghai"] == null)
-            {
-                jo["ninghai"] = 0;
-            }
-            dic.Add("ninghai", (int)jo["ninghai"]);
-            if (jo["addmodel"] == null)
-            {
-                jo["addmodel"] = 0;
-            }
-            dic.Add("addmodel", (int)jo["addmodel"]);
-            if (jo["addpanorama"] == null)
-            {
-                jo["addpanorama"] = 0;
-            }
-            dic.Add("addpanorama", (int)jo["addpanorama"]);
+            Dictionary<string, int?> dic = new Dictionary<string, int?>();
+            dic.Add("cunzhuang", (int?)jo["cunzhuang"]);
+            dic.Add("cesuo", (int?)jo["cesuo"]);
+            dic.Add("minsu", (int?)jo["minsu"]);
+            dic.Add("jingqu", (int?)jo["jingqu"]);
+            dic.Add("addtuceng", (int?)jo["addtuceng"]);
+            dic.Add("shouhuiditu", (int?)jo["shouhuiditu"]);
+            dic.Add("addimage", (int?)jo["addimage"]);
+            dic.Add("ninghaimaoyucun", (int?)jo["ninghaimaoyucun"]);
+            dic.Add("ninghai", (int?)jo["ninghai"]);
+            dic.Add("addmodel", (int?)jo["addmodel"]);
+            dic.Add("addpanorama", (int?)jo["addpanorama"]);
             strSql = @"SELECT u.hy_username as username,p.p_name as pname,up.p_value as pvalue FROM user_permission up RIGHT JOIN (SELECT * FROM `user` WHERE `user`.hy_username=@hy_username) u ON up.uid=u.hy_userid RIGHT JOIN permission p ON up.pid=p.p_id";
             mySqlParameters = new MySqlParameter[]
             {
@@ -151,17 +107,17 @@ namespace permission.service.impl
                     {
                         new MySqlParameter("@hy_username",MySqlDbType.VarChar,50) {Value=username },
                         new MySqlParameter("@p_name",MySqlDbType.VarChar,50) {Value=pp.pname },
-                        new MySqlParameter("@p_value",MySqlDbType.Int32) {Value=pp.pvalue }
+                        new MySqlParameter("@p_value",MySqlDbType.Int32) {Value=(pp.pvalue==null?0:pp.pvalue) }
                     };
                     ResultUtil.insOrUpdOrDel(strSql, mySqlParameters);
                 }
             }
-            foreach (KeyValuePair<string, int> kv in dic)
+            foreach (KeyValuePair<string, int?> kv in dic)
             {
                 strSql = "UPDATE user_permission up SET up.p_value=@p_value WHERE up.uid=(SELECT `user`.hy_userid FROM `user` WHERE `user`.hy_username=@hy_username) AND up.pid=(SELECT permission.p_id FROM permission WHERE permission.p_name=@p_name)";
                 mySqlParameters = new MySqlParameter[]
                 {
-                    new MySqlParameter("@p_value",MySqlDbType.Int32) {Value=kv.Value },
+                    new MySqlParameter("@p_value",MySqlDbType.Int32) {Value=(kv.Value==null?0:kv.Value) },
                     new MySqlParameter("@hy_username",MySqlDbType.VarChar,50) {Value=username },
                     new MySqlParameter("@p_name",MySqlDbType.VarChar,50) {Value=kv.Key }
                 };
