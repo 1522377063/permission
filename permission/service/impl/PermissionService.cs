@@ -87,7 +87,7 @@ namespace permission.service.impl
             List<PartPermission> partPermissionList = ResultUtil.getResultList<PartPermission>(strSql, mySqlParameters);
             foreach (PartPermission pp in partPermissionList)
             {
-                if (pp.pvalue == null && pp.username == null)
+                /*if (pp.pvalue == null && pp.username == null)
                 {
                     strSql =
                         @"SELECT COUNT(1) FROM user_permission up WHERE up.uid=(SELECT u.hy_userid FROM `user` u WHERE u.hy_username=@hy_username) AND up.pid=(SELECT p.p_id FROM permission p WHERE p.p_name=@p_name)";
@@ -101,6 +101,18 @@ namespace permission.service.impl
                     {
                         continue;
                     }
+                    strSql =
+                        @"INSERT INTO user_permission (uid,pid,p_value) VALUES((SELECT u.hy_userid FROM `user` u WHERE u.hy_username=@hy_username),(SELECT p.p_id FROM permission p WHERE p.p_name=@p_name),@p_value)";
+                    mySqlParameters = new MySqlParameter[]
+                    {
+                        new MySqlParameter("@hy_username",MySqlDbType.VarChar,50) {Value=username },
+                        new MySqlParameter("@p_name",MySqlDbType.VarChar,50) {Value=pp.pname },
+                        new MySqlParameter("@p_value",MySqlDbType.Int32) {Value=(pp.pvalue==null?0:pp.pvalue) }
+                    };
+                    ResultUtil.insOrUpdOrDel(strSql, mySqlParameters);
+                }*/
+                if (pp.pvalue == null)
+                {
                     strSql =
                         @"INSERT INTO user_permission (uid,pid,p_value) VALUES((SELECT u.hy_userid FROM `user` u WHERE u.hy_username=@hy_username),(SELECT p.p_id FROM permission p WHERE p.p_name=@p_name),@p_value)";
                     mySqlParameters = new MySqlParameter[]
