@@ -47,13 +47,7 @@ namespace permission
         < p>输出格式：<strong>json</strong></p></br>")]
         public void EditUserPermission(string json)
         {
-            //HttpRequest request = HttpContext.Current.Request;
-            //Stream stream = request.InputStream;
-            //StreamReader streamReader = new StreamReader(stream);
-            //string json = string.Empty;
-            //json = streamReader.ReadToEnd();
-            ////{"username":"张三","cunzhuang":0,"cesuo":0,"minsu":1,"jingqu":1,"addtuceng":1,"shouhuiditu":0,"addimage":1,"ninghaimaoyucun":0,"ninghai":1,"addmodel":1,"addpanorama":1}
-            //json = HttpUtility.UrlDecode(json);
+            //{"username":"张三","cunzhuang":0,"cesuo":0,"minsu":1,"jingqu":1,"addtuceng":1,"shouhuiditu":0,"addimage":1,"ninghaimaoyucun":0,"ninghai":1,"addmodel":1,"addpanorama":1}
 
             Context.Response.ContentType = "application/json;charset=utf-8";
             Context.Response.ContentEncoding = Encoding.GetEncoding("utf-8");

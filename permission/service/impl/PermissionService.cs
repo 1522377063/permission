@@ -17,7 +17,8 @@ namespace permission.service.impl
         private MySqlParameter[] mySqlParameters;
         public string GetUserPermissionList(int page, int rows)
         {
-            int total = int.Parse(ResultUtil.getResultString("SELECT count(1) FROM `user`"));
+            //获取总个数
+            int total = int.Parse(ResultUtil.getResultString("SELECT count(1) FROM `user` WHERE hy_username!=''"));
             //获取每一个用户,除username为null的用户
             strSql = "SELECT * FROM `user` WHERE hy_username!='' LIMIT @begin,@rows";
             mySqlParameters = new MySqlParameter[]
@@ -87,32 +88,9 @@ namespace permission.service.impl
             List<PartPermission> partPermissionList = ResultUtil.getResultList<PartPermission>(strSql, mySqlParameters);
             foreach (PartPermission pp in partPermissionList)
             {
-                /*if (pp.pvalue == null && pp.username == null)
-                {
-                    strSql =
-                        @"SELECT COUNT(1) FROM user_permission up WHERE up.uid=(SELECT u.hy_userid FROM `user` u WHERE u.hy_username=@hy_username) AND up.pid=(SELECT p.p_id FROM permission p WHERE p.p_name=@p_name)";
-                    mySqlParameters = new MySqlParameter[]
-                    {
-                        new MySqlParameter("@hy_username",MySqlDbType.VarChar,50) {Value=username },
-                        new MySqlParameter("@p_name",MySqlDbType.VarChar,50) {Value=pp.pname }
-                    };
-                    int num = int.Parse(ResultUtil.getResultString(strSql, mySqlParameters));
-                    if (num > 0)
-                    {
-                        continue;
-                    }
-                    strSql =
-                        @"INSERT INTO user_permission (uid,pid,p_value) VALUES((SELECT u.hy_userid FROM `user` u WHERE u.hy_username=@hy_username),(SELECT p.p_id FROM permission p WHERE p.p_name=@p_name),@p_value)";
-                    mySqlParameters = new MySqlParameter[]
-                    {
-                        new MySqlParameter("@hy_username",MySqlDbType.VarChar,50) {Value=username },
-                        new MySqlParameter("@p_name",MySqlDbType.VarChar,50) {Value=pp.pname },
-                        new MySqlParameter("@p_value",MySqlDbType.Int32) {Value=(pp.pvalue==null?0:pp.pvalue) }
-                    };
-                    ResultUtil.insOrUpdOrDel(strSql, mySqlParameters);
-                }*/
                 if (pp.pvalue == null)
                 {
+                    //添加用户权限值是null的权限值为0
                     strSql =
                         @"INSERT INTO user_permission (uid,pid,p_value) VALUES((SELECT u.hy_userid FROM `user` u WHERE u.hy_username=@hy_username),(SELECT p.p_id FROM permission p WHERE p.p_name=@p_name),@p_value)";
                     mySqlParameters = new MySqlParameter[]
@@ -126,6 +104,7 @@ namespace permission.service.impl
             }
             foreach (KeyValuePair<string, int?> kv in dic)
             {
+                //修改用户权限值
                 strSql = "UPDATE user_permission up SET up.p_value=@p_value WHERE up.uid=(SELECT `user`.hy_userid FROM `user` WHERE `user`.hy_username=@hy_username) AND up.pid=(SELECT permission.p_id FROM permission WHERE permission.p_name=@p_name)";
                 mySqlParameters = new MySqlParameter[]
                 {
