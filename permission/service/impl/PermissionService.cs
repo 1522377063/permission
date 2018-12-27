@@ -67,16 +67,60 @@ namespace permission.service.impl
             JObject jo = JsonConvert.DeserializeObject(json) as JObject;
             string username = jo["username"].ToString();
             Dictionary<string, int> dic = new Dictionary<string, int>();
+            if (jo["cunzhuang"] == null)
+            {
+                jo["cunzhuang"] = 0;
+            }
             dic.Add("cunzhuang", (int)jo["cunzhuang"]);
+            if (jo["cesuo"] == null)
+            {
+                jo["cesuo"] = 0;
+            }
             dic.Add("cesuo", (int)jo["cesuo"]);
+            if (jo["minsu"] == null)
+            {
+                jo["minsu"] = 0;
+            }
             dic.Add("minsu", (int)jo["minsu"]);
+            if (jo["jingqu"] == null)
+            {
+                jo["jingqu"] = 0;
+            }
             dic.Add("jingqu", (int)jo["jingqu"]);
+            if (jo["addtuceng"] == null)
+            {
+                jo["addtuceng"] = 0;
+            }
             dic.Add("addtuceng", (int)jo["addtuceng"]);
+            if (jo["shouhuiditu"] == null)
+            {
+                jo["shouhuiditu"] = 0;
+            }
             dic.Add("shouhuiditu", (int)jo["shouhuiditu"]);
+            if (jo["addimage"] == null)
+            {
+                jo["addimage"] = 0;
+            }
             dic.Add("addimage", (int)jo["addimage"]);
+            if (jo["ninghaimaoyucun"] == null)
+            {
+                jo["ninghaimaoyucun"] = 0;
+            }
             dic.Add("ninghaimaoyucun", (int)jo["ninghaimaoyucun"]);
+            if (jo["ninghai"] == null)
+            {
+                jo["ninghai"] = 0;
+            }
             dic.Add("ninghai", (int)jo["ninghai"]);
+            if (jo["addmodel"] == null)
+            {
+                jo["addmodel"] = 0;
+            }
             dic.Add("addmodel", (int)jo["addmodel"]);
+            if (jo["addpanorama"] == null)
+            {
+                jo["addpanorama"] = 0;
+            }
             dic.Add("addpanorama", (int)jo["addpanorama"]);
             strSql = @"SELECT u.hy_username as username,p.p_name as pname,up.p_value as pvalue FROM user_permission up RIGHT JOIN (SELECT * FROM `user` WHERE `user`.hy_username=@hy_username) u ON up.uid=u.hy_userid RIGHT JOIN permission p ON up.pid=p.p_id";
             mySqlParameters = new MySqlParameter[]
