@@ -27,12 +27,14 @@ namespace permission.service.impl
         /// <returns>{"total":2,"rows":[{"username":"电子合同测试","cunzhuang":null,"cesuo":null,"minsu":null,"jingqu":null,"addtuceng":null,"shouhuiditu":null,"addimage":null,"ninghaimaoyucun":null,"ninghai":null,"addmodel":null,"addpanorama":null},{"username":"测试账号","cunzhuang":0,"cesuo":0,"minsu":0,"jingqu":0,"addtuceng":0,"shouhuiditu":0,"addimage":1,"ninghaimaoyucun":1,"ninghai":1,"addmodel":1,"addpanorama":1}]}</returns>
         public string GetUserPermissionList(int page, int rows)
         {
+            int err = 0;
             try
             {
                 //获取用户表除用户名为空的总数
                 int total = int.Parse(ResultUtil.getResultString("SELECT count(1) FROM `user` WHERE hy_username!=''"));
-               
+                err++;
                 strSql = "SELECT * FROM `user` WHERE hy_username!='' LIMIT @begin,@rows";
+                err++;
                 mySqlParameters = new MySqlParameter[]
                 {
                     //开始位置
@@ -40,17 +42,22 @@ namespace permission.service.impl
                     //请求行数
                     new MySqlParameter("@rows",MySqlDbType.Int32) {Value=Convert.ToInt32(rows) }
                 };
+                err++;
                 //获取每一个用户,除username为null的用户
                 List<User> userList = ResultUtil.getResultList<User>(strSql, mySqlParameters);
+                err++;
                 //创建一个jsonObject
                 JObject jo1 = new JObject();
+                err++;
                 //添加total总数数值
                 jo1.Add("total", total);
+                err++;
                 //如果用户表集合不为空
                 if (userList != null)
                 {
                     //创建一个jsonArray
                     JArray ja = new JArray();
+                    err++;
                     //遍历用户集合
                     foreach (User user in userList)
                     {
@@ -79,9 +86,10 @@ namespace permission.service.impl
                         }
 
                     }
+                    err++;
                     //添加rows属性
                     jo1.Add("rows", ja);
-
+                    err++;
                 }
                 //返回json 
                 return jo1.ToString();
@@ -89,7 +97,8 @@ namespace permission.service.impl
             catch(Exception ex)
             {
                 LogHelper.WriteError("查询失败：" + ex.Message);
-                return "{ \"total\":0,\"rows\":[]}";
+                return ResultUtil.getStandardResult((int) Status.Error,
+                    EnumUtil.getMessageStr((int) Message.QueryFailure), err + ex.Message);
             }
 
         }
@@ -172,7 +181,7 @@ namespace permission.service.impl
                 //往日志中写入错误
                 LogHelper.WriteError("新增、修改、删除操作异常回滚：" + ex.Message);
                 //返回修改失败对应的json
-                return ResultUtil.getStandardResult((int)Status.Error, EnumUtil.getMessageStr((int)Message.UpdateFailure), null);
+                return ResultUtil.getStandardResult((int)Status.Error, EnumUtil.getMessageStr((int)Message.UpdateFailure), ex.Message);
             }
             
         }
@@ -203,7 +212,7 @@ namespace permission.service.impl
                 //往日志中写入错误
                 LogHelper.WriteError("新增、修改、删除操作异常回滚：" + ex.Message);
                 //返回修改失败对应的json
-                return ResultUtil.getStandardResult((int)Status.Error, EnumUtil.getMessageStr((int)Message.DeleteFailure), null);
+                return ResultUtil.getStandardResult((int)Status.Error, EnumUtil.getMessageStr((int)Message.DeleteFailure), ex.Message);
             }
             
         }
